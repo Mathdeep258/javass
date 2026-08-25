@@ -2,20 +2,20 @@
 
 export const siteConfig = {
   // 1. 网站标题与博主信息
-  title: "LinFan的个人网页",
-  faviconUrl: "https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260810131109_287_3.png",
-  authorName: "LinFan",
-  bio: "人工智能训练师四级，目前在硬件（单片机）、网安、编程中烦恼。",
+  title: "XingHuiSama の 宝藏之地",
+  faviconUrl: "https://bu.dusays.com/2026/03/24/69c1e38ac1846.jpg",
+  authorName: "XingHuiSama",
+  bio: "在代码、学术与分子动力学模拟间穿梭的普通人。近期正埋头于 GROMACS 模拟研究与神经网络计算。",
 
-  navTitle: "LinFan",
+  navTitle: "XingHuiSama",
 
   // 👇 【新增】导航栏中间的那个后缀/分隔符（默认是 の）
-  navSuffix: "@",
+  navSuffix: "の",
 
-  navAfter: "个人网页",
+  navAfter: "宝藏之地",
 
   // 2. 头像设置 (支持网络链接，或将图片放入 public 文件夹后使用 "/me.jpg")
-  avatarUrl: "https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20260531183359_194_3.jpg",
+  avatarUrl: "https://bu.dusays.com/2026/03/24/69c1e38ac1846.jpg",
 
   // 3. 网站背景设置 (二选一)
   // 如果想用纯图片背景，请在下面 bgImage 写路径，并将 useGradient 设为 false
@@ -34,9 +34,9 @@ export const siteConfig = {
     github: "",
     gitee: "",
     google: "",
-    email: "3459238738@qq.com",
-    qq: "3459238738",
-    wechat: "",
+    email: "",
+    qq: "1124533793",
+    wechat: "XingHuisama",
   },
   counts: {
     photos: 128, // 照片墙数量可以手动写死或动态计算
@@ -66,6 +66,6 @@ export const siteConfig = {
     maxOutputTokens: 150,
     temperature: 0.85,
   },
-  friendLinkApplyFormat: "名称：LinFan的个人网页\\\\\n\n简介：自己看\\\\\n\n链接:",
+  friendLinkApplyFormat: "名称：XingHuiSamaの宝藏之地\n简介：今天我也要学习吗\n链接：https://www.xinghuisama.top\n头像：https://bu.dusays.com/2026/03/24/69c1e38ac1846.jpg",
   enableLevelSystem: true,
 };
