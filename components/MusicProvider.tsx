@@ -33,6 +33,43 @@ function parseLrc(lrcText: string) {
   return result.sort((a, b) => a.time - b.time);
 }
 
+const DEFAULT_COVER = "/music/cover-placeholder.svg";
+
+function normalizeLocalSong(song: any, index: number) {
+  return {
+    id: song.id || `local-${index}-${Date.now()}`,
+    title: song.title || song.name || "未知歌曲",
+    artist: song.artist || song.author || "未知歌手",
+    cover: song.cover || song.pic || DEFAULT_COVER,
+    src: song.src || song.url || "",
+    lrcUrl: song.lrc || song.lrcUrl || null,
+    lrc: null,
+    lyrics: Array.isArray(song.lyrics) ? song.lyrics : [],
+  };
+}
+
+async function fetchBackendPlaylist() {
+  try {
+    const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
+    if (!configRes.ok) return null;
+    const configData = await configRes.json();
+    if (!configData?.api_port) return null;
+
+    const res = await fetch(
+      `http://127.0.0.1:${configData.api_port}/api/music/list`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const list = Array.isArray(data)
+      ? data
+      : data?.data ?? data?.songs ?? data?.playlist;
+    return Array.isArray(list) ? list : null;
+  } catch {
+    return null;
+  }
+}
+
 // 🌟 1. 扩充 Context 类型，加入 MusicPage 需要的所有属性
 type PlayMode = 'loop' | 'single' | 'random';
 
@@ -55,6 +92,7 @@ interface MusicContextType {
   prevSong: () => void;
   handleSeek: (e: React.ChangeEvent<HTMLInputElement>) => void;
   playSong: (index: number) => void;
+  selectSong?: (index: number) => void;
   setVolume: (value: number) => void;
   toggleMute: () => void;
   togglePlayMode: () => void;
@@ -80,124 +118,37 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   const fetchMusicData = async () => {
-  //     try {
-  //       const res = await fetch(`/api/music?ids=${siteConfig.cloudMusicIds.join(',')}`);
-  //       const rawResults = await res.json();
-
-  //       const mergedPlaylist = rawResults
-  //         .filter((song: any) => song && song.url && !song.error)
-  //         .map((song: any) => ({
-  //           id: song.id || Math.random().toString(),
-  //           title: song.name || '未知歌曲',
-  //           artist: song.artist || song.author || '未知歌手',
-  //           cover: song.cover || song.pic || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
-  //           src: song.url,
-  //           lrcUrl: null,
-  //           lyrics: song.lrc ? parseLrc(song.lrc) : []
-  //         }));
-
-  //       if (isMounted) {
-  //         if (mergedPlaylist.length > 0) setPlaylist(mergedPlaylist);
-  //         else setCurrentLyric("云端链路受阻");
-  //         setIsLoading(false);
-  //       }
-  //     } catch (error) {
-  //       if (isMounted) { setCurrentLyric("网络初始化失败"); setIsLoading(false); }
-  //     }
-  //   };
-
-  //   if (siteConfig.cloudMusicIds?.length > 0) fetchMusicData();
-  //   else setIsLoading(false);
-
-  //   return () => { isMounted = false; };
-  // }, []);
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  // 优先使用本地音乐
-  const localList = (siteConfig as any).localMusicList;
+    const initPlaylist = async () => {
+      let source: any[] | null = null;
 
-  if (localList && localList.length > 0) {
-    const localPlaylist = localList.map((song: any) => ({
-      id: song.id || Math.random().toString(),
-      title: song.title || "未知歌曲",
-      artist: song.artist || "未知歌手",
-      cover:
-        song.cover ||
-        "https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg",
-      src: song.src,
-      lrcUrl: null,
-      lyrics: [],
-    }));
+      // 生产模式优先从后端拉最新歌单，本地模式直接读静态配置
+      if (process.env.NODE_ENV === "production") {
+        source = await fetchBackendPlaylist();
+      }
 
-    if (isMounted) {
-      setPlaylist(localPlaylist);
+      if (!source || source.length === 0) {
+        const local = (siteConfig as any).localMusic;
+        source = Array.isArray(local) ? local : [];
+      }
+
+      if (!isMounted) return;
+
+      const normalized = (source || []).map(normalizeLocalSong);
+      if (normalized.length > 0) {
+        setPlaylist(normalized);
+      } else {
+        setCurrentLyric("暂无本地音乐");
+      }
       setIsLoading(false);
-    }
-
-    return () => {
-      isMounted = false;
     };
-  }
 
-  // 如果没有本地音乐，再尝试网易云
-  const fetchMusicData = async () => {
-    try {
-      if (!siteConfig.cloudMusicIds?.length) {
-        if (isMounted) {
-          setPlaylist([]);
-          setIsLoading(false);
-        }
-        return;
-      }
+    initPlaylist();
 
-      const res = await fetch(
-        `/api/music?ids=${siteConfig.cloudMusicIds.join(",")}`
-      );
-
-      const rawResults = await res.json();
-
-      const mergedPlaylist = rawResults
-        .filter((song: any) => song && song.url && !song.error)
-        .map((song: any) => ({
-          id: song.id || Math.random().toString(),
-          title: song.name || "未知歌曲",
-          artist: song.artist || song.author || "未知歌手",
-          cover:
-            song.cover ||
-            song.pic ||
-            "https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg",
-          src: song.url,
-          lrcUrl: null,
-          lyrics: song.lrc ? parseLrc(song.lrc) : [],
-        }));
-
-      if (isMounted) {
-        if (mergedPlaylist.length > 0) {
-          setPlaylist(mergedPlaylist);
-        } else {
-          setCurrentLyric("云端链路受阻");
-        }
-
-        setIsLoading(false);
-      }
-    } catch {
-      if (isMounted) {
-        setCurrentLyric("网络初始化失败");
-        setIsLoading(false);
-      }
-    }
-  };
-
-  fetchMusicData();
-
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     if (playlist.length === 0) return;
