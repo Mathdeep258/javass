@@ -1,12 +1,26 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../siteConfig';
+import { VIDEOS, OVERLAY_IMAGE } from './LumoraHero';
 
 export default function SplashScreen() {
   const [show, setShow] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(0);
+  const cycleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const exitSplash = () => {
+    setShow(false);
+    sessionStorage.setItem('hasSeenSplash', 'true');
+
+    setTimeout(() => {
+      document.documentElement.classList.add('splash-seen');
+    }, 500);
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -14,31 +28,110 @@ export default function SplashScreen() {
 
     if (!hasSeenSplash) {
       setShow(true);
-      const timer = setTimeout(() => {
-        exitSplash();
-      }, 2200);
-      return () => clearTimeout(timer);
+      const useLumora = siteConfig.homepageHero === 'lumora';
+
+      if (useLumora) {
+        cycleTimer.current = setInterval(() => {
+          setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
+        }, 2800);
+        readyTimer.current = setTimeout(() => setReady(true), 4200);
+      } else {
+        readyTimer.current = setTimeout(() => exitSplash(), 2200);
+      }
     } else {
-      // 容错处理：确保直接访问时类名存在
       document.documentElement.classList.add('splash-seen');
     }
+
+    return () => {
+      if (cycleTimer.current) clearInterval(cycleTimer.current);
+      if (readyTimer.current) clearTimeout(readyTimer.current);
+    };
   }, []);
-
-  const exitSplash = () => {
-    setShow(false);
-    sessionStorage.setItem('hasSeenSplash', 'true');
-
-    // 【核心解封】：动画快结束时，给 html 加上类名，CSS 会自动把内容显示出来
-    setTimeout(() => {
-      document.documentElement.classList.add('splash-seen');
-    }, 500);
-  };
 
   if (!isMounted) return null;
 
+  const useLumora = siteConfig.homepageHero === 'lumora';
+
   return (
     <AnimatePresence>
-      {show && (
+      {show && useLumora && (
+        <motion.div
+          key="lumora-splash"
+          exit={{ opacity: 0, scale: 1.08, filter: "blur(20px)" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="fixed inset-0 z-[100000] overflow-hidden bg-black"
+        >
+          <div className="absolute inset-0">
+            {VIDEOS.map((video, index) => (
+              <video
+                key={video.url}
+                src={video.url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                  index === activeVideo ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+            <img
+              src={OVERLAY_IMAGE}
+              alt=""
+              className="train-bob absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-black/15" />
+
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-6">
+            <AnimatePresence>
+              {ready && (
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="flex flex-col items-center">
+                    <span
+                      className="text-sm font-black italic uppercase tracking-[0.55em] text-cyan-200 sm:text-lg"
+                      style={{ textShadow: '0 0 18px rgba(34,211,238,0.8), 0 0 42px rgba(244,114,182,0.45)' }}
+                    >
+                      Welcome
+                    </span>
+                    <h1
+                      className="mt-2 bg-gradient-to-r from-white via-cyan-200 to-pink-200 bg-clip-text text-5xl font-black uppercase tracking-[0.18em] text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.45)] sm:text-7xl"
+                      style={{ fontFamily: "'Instrument Serif', serif" }}
+                    >
+                      linfannet
+                    </h1>
+                    <div className="mt-5 h-px w-24 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+                    <p className="mt-4 text-[10px] tracking-[0.45em] text-white/60 sm:text-xs">
+                      YOUR PERSONAL UNIVERSE
+                    </p>
+                  </div>
+                  <button
+                    onClick={exitSplash}
+                    className="group relative mt-10 overflow-hidden rounded-full border border-cyan-300/50 bg-cyan-400/10 px-14 py-4 text-base font-black uppercase tracking-[0.4em] text-cyan-50 shadow-[0_0_30px_rgba(34,211,238,0.35)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-pink-300/60 hover:bg-cyan-300/20 hover:shadow-[0_0_50px_rgba(34,211,238,0.6)] sm:px-16 sm:py-5 sm:text-lg"
+                  >
+                    <span className="relative z-10">Enter</span>
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/25 to-pink-400/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {!ready && (
+              <p className="absolute bottom-8 text-[10px] tracking-[0.5em] text-white/40">
+                LOADING IMMERSIVE SPACE...
+              </p>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {show && !useLumora && (
         <motion.div
           key="splash-screen-container"
           exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
@@ -46,7 +139,6 @@ export default function SplashScreen() {
           className="fixed inset-0 z-[100000] flex flex-col items-center justify-center bg-white dark:bg-slate-950"
         >
           <div className="relative z-10 flex flex-col items-center">
-            {/* 头像光环 */}
             <div className="relative w-24 h-24 mb-8">
               <motion.div
                 animate={{ rotate: 360 }}

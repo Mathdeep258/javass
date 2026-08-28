@@ -21,14 +21,26 @@ export const siteConfig = {
   // 如果想用纯图片背景，请在下面 bgImage 写路径，并将 useGradient 设为 false
   useGradient: false,
   themeColors: ["#a18cd1", "#fbc2eb", "#a1c4fd", "#c2e9fb"], // 呼吸流动的颜色组合
-// 修改这里：变成图片数组
+  // 修改这里：变成图片数组
   bgImages: ["https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/1.jpg", "https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/2.jpg"],
+
+  // 🌆 Cyberpunk 视觉层：总开关和配色都可以自己改
+  cyberpunk: {
+    enabled: true,
+    accent: "#22d3ee",
+    secondary: "#f472b6",
+    grid: true,
+    scanlines: true,
+    glitch: true,
+    hudCorners: true,
+  },
 
   // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示)
   defaultPostCover: "https://bu.dusays.com/2026/03/24/69c1e38b346cb.jpg",
 
   // 5. 首页照片墙预览图
   photoWallImage: "https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg",
+  homepageHero: "lumora",
   localMusic: [{"id": "1", "title": "Just the Two of Us", "artist": "Grover Washington Jr. / Bill Withers", "cover": "/music/1.png", "src": "/music/just_the_two_of_us.mp3", "lrc": "/music/Bill Withers - Just The Two Of Us.lrc"}, {"id": "1787820007302", "title": "I Really Want to Stay at Your House", "artist": "Samuel Kim; Lorien", "cover": "/music/2.png", "src": "/music/Samuel Kim - I Really Want to Stay at Your House.mp3", "lrc": "/music/Samuel Kim - I Really Want to Stay at Your House.lrc"}, {"id": "1787821432689", "title": "丸ノ内サディスティック", "artist": "椎名林檎", "cover": "/music/3.png", "src": "/music/3.mp3", "lrc": "/music/3.lrc"}],
   social: {
     github: "",
