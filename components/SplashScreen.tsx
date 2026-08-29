@@ -25,19 +25,17 @@ export default function SplashScreen() {
   useEffect(() => {
     setIsMounted(true);
     const hasSeenSplash = sessionStorage.getItem('hasSeenSplash') === 'true';
+    const useLumora = siteConfig.homepageHero === 'lumora';
 
-    if (!hasSeenSplash) {
+    if (useLumora) {
       setShow(true);
-      const useLumora = siteConfig.homepageHero === 'lumora';
-
-      if (useLumora) {
-        cycleTimer.current = setInterval(() => {
-          setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
-        }, 2800);
-        readyTimer.current = setTimeout(() => setReady(true), 4200);
-      } else {
-        readyTimer.current = setTimeout(() => exitSplash(), 2200);
-      }
+      cycleTimer.current = setInterval(() => {
+        setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
+      }, 2800);
+      readyTimer.current = setTimeout(() => setReady(true), 4200);
+    } else if (!hasSeenSplash) {
+      setShow(true);
+      readyTimer.current = setTimeout(() => exitSplash(), 2200);
     } else {
       document.documentElement.classList.add('splash-seen');
     }
