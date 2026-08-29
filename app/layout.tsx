@@ -1,6 +1,6 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Serif_SC, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import BackgroundEffects from "../components/BackgroundEffects";
@@ -26,6 +26,11 @@ const notoSerif = Noto_Serif_SC({
   variable: "--font-serif",
   display: 'swap',
 });
+const instrumentSerif = Instrument_Serif({
+  weight: ["400"],
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: siteConfig.title,
@@ -40,7 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased ${siteConfig.cyberpunk?.enabled ? 'cyberpunk-mode' : ''} ${siteConfig.cyberpunk?.enabled && !siteConfig.cyberpunk?.glitch ? 'cyber-glitch-off' : ''}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} ${instrumentSerif.className} h-full antialiased ${siteConfig.cyberpunk?.enabled ? 'cyberpunk-mode' : ''} ${siteConfig.cyberpunk?.enabled && !siteConfig.cyberpunk?.glitch ? 'cyber-glitch-off' : ''}`}
       style={{ '--cyber-accent': siteConfig.cyberpunk?.accent || '#22d3ee', '--cyber-secondary': siteConfig.cyberpunk?.secondary || '#f472b6' } as React.CSSProperties}
       suppressHydrationWarning
     >

@@ -107,16 +107,16 @@ export default function SplashScreen() {
                       linfannet
                     </h1>
                     <div className="mt-5 h-px w-24 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-                    <p className="mt-4 text-[10px] tracking-[0.45em] text-white/60 sm:text-xs">
-                      YOUR PERSONAL UNIVERSE
+                    <p className="mt-4 text-xs tracking-[0.5em] text-white/80 sm:text-sm">
+                      LinFan PERSONAL UNIVERSE
                     </p>
                   </div>
                   <button
                     onClick={exitSplash}
-                    className="group relative mt-10 overflow-hidden rounded-full border border-cyan-300/50 bg-cyan-400/10 px-14 py-4 text-base font-black uppercase tracking-[0.4em] text-cyan-50 shadow-[0_0_30px_rgba(34,211,238,0.35)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-pink-300/60 hover:bg-cyan-300/20 hover:shadow-[0_0_50px_rgba(34,211,238,0.6)] sm:px-16 sm:py-5 sm:text-lg"
+                    className="mt-10 rounded-full border border-cyan-300/60 bg-transparent px-14 py-4 text-base font-black uppercase tracking-[0.4em] text-cyan-50 shadow-[0_0_30px_rgba(34,211,238,0.35)] transition-all duration-300 hover:scale-105 hover:border-pink-300/70 hover:text-white hover:shadow-[0_0_50px_rgba(34,211,238,0.6)] sm:px-16 sm:py-5 sm:text-lg"
+                    style={{ textShadow: '0 0 18px rgba(34,211,238,0.7)' }}
                   >
-                    <span className="relative z-10">Enter</span>
-                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/25 to-pink-400/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    Enter
                   </button>
                 </motion.div>
               )}
