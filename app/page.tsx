@@ -34,6 +34,8 @@ function formatUpdateTime(dateString: string) {
   } catch { return dateString; }
 }
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const postsDirectory = path.join(process.cwd(), 'posts');
   let allPosts: any[] = [];

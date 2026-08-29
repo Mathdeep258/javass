@@ -11,6 +11,8 @@ export const metadata = {
   description: "生活动态与瞬间记录",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function MomentsPage() {
   let allMoments: any[] = [];
 
