@@ -32,7 +32,7 @@ export default function SplashScreen() {
       cycleTimer.current = setInterval(() => {
         setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
       }, 2800);
-      readyTimer.current = setTimeout(() => setReady(true), 4200);
+      readyTimer.current = setTimeout(() => setReady(true), 6000);
     } else if (!hasSeenSplash) {
       setShow(true);
       readyTimer.current = setTimeout(() => exitSplash(), 2200);
@@ -60,6 +60,7 @@ export default function SplashScreen() {
           className="fixed inset-0 z-[100000] overflow-hidden bg-black"
         >
           <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(244,114,182,0.16),transparent_55%),linear-gradient(135deg,#020617,#0f172a_55%,#1e1b4b)]" />
             {VIDEOS.map((video, index) => (
               <video
                 key={video.url}
@@ -68,6 +69,7 @@ export default function SplashScreen() {
                 muted
                 loop
                 playsInline
+                preload="auto"
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
                   index === activeVideo ? 'opacity-100' : 'opacity-0'
                 }`}
