@@ -15,7 +15,6 @@ import CyberCat from '../components/CyberCat';
 import DanmakuBackground from '../components/DanmakuBackground';
 
 import MobileBackButton from '../components/MobileBackButton';
-import CyberpunkOverlay from '../components/CyberpunkOverlay';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -45,8 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} ${instrumentSerif.className} h-full antialiased ${siteConfig.cyberpunk?.enabled ? 'cyberpunk-mode' : ''} ${siteConfig.cyberpunk?.enabled && !siteConfig.cyberpunk?.glitch ? 'cyber-glitch-off' : ''}`}
-      style={{ '--cyber-accent': siteConfig.cyberpunk?.accent || '#22d3ee', '--cyber-secondary': siteConfig.cyberpunk?.secondary || '#f472b6' } as React.CSSProperties}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} ${instrumentSerif.className} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -107,14 +105,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="hidden md:block">
                 <DanmakuBackground />
               </div>
-
-              {siteConfig.cyberpunk?.enabled && (
-                <CyberpunkOverlay
-                  grid={siteConfig.cyberpunk?.grid}
-                  scanlines={siteConfig.cyberpunk?.scanlines}
-                  hudCorners={siteConfig.cyberpunk?.hudCorners}
-                />
-              )}
 
               <div className="relative z-10 flex-1 flex flex-col">
                 {children}

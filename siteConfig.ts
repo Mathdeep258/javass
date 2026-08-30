@@ -24,17 +24,6 @@ export const siteConfig = {
   // 修改这里：变成图片数组
   bgImages: ["https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/1.jpg", "https://pub-765df429105042d8a0d2a68ac29453aa.r2.dev/2.jpg"],
 
-  // 🌆 Cyberpunk 视觉层：总开关和配色都可以自己改
-  cyberpunk: {
-    enabled: true,
-    accent: "#22d3ee",
-    secondary: "#f472b6",
-    grid: true,
-    scanlines: true,
-    glitch: true,
-    hudCorners: true,
-  },
-
   // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示)
   defaultPostCover: "https://bu.dusays.com/2026/03/24/69c1e38b346cb.jpg",
 

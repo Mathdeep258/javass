@@ -4,7 +4,28 @@ import { siteConfig } from '../siteConfig';
 
 export default function BackgroundSlider() {
   const [index, setIndex] = useState(0);
-  const images = siteConfig.bgImages;
+  const [images, setImages] = useState<string[]>(siteConfig.bgImages || []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadImages = async () => {
+      try {
+        const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
+        if (!configRes.ok) return;
+        const configData = await configRes.json();
+        if (!configData?.api_port) return;
+        const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/config/get`, {
+          cache: 'no-store',
+        });
+        const data = await res.json();
+        if (isMounted && data.success && Array.isArray(data.data?.bgImages) && data.data.bgImages.length > 0) {
+          setImages(data.data.bgImages);
+        }
+      } catch {}
+    };
+    loadImages();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     if (images.length <= 1) return;
