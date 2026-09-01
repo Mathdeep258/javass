@@ -5,43 +5,41 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../siteConfig';
 import { VIDEOS, OVERLAY_IMAGE } from './LumoraHero';
 
+const SPLASH_VIDEO = VIDEOS[0];
+
 export default function SplashScreen() {
   const [show, setShow] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [ready, setReady] = useState(false);
-  const [activeVideo, setActiveVideo] = useState(0);
-  const cycleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const exitSplash = () => {
     setShow(false);
-    sessionStorage.setItem('hasSeenSplash', 'true');
+    try {
+      sessionStorage.setItem('hasSeenSplash', 'true');
+    } catch {}
 
     setTimeout(() => {
       document.documentElement.classList.add('splash-seen');
-    }, 500);
+    }, 300);
   };
 
   useEffect(() => {
     setIsMounted(true);
-    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash') === 'true';
-    const useLumora = siteConfig.homepageHero === 'lumora';
+    let hasSeenSplash = false;
+    try {
+      hasSeenSplash = sessionStorage.getItem('hasSeenSplash') === 'true';
+    } catch {}
 
-    if (useLumora) {
-      setShow(true);
-      cycleTimer.current = setInterval(() => {
-        setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
-      }, 2800);
-      readyTimer.current = setTimeout(() => setReady(true), 6000);
-    } else if (!hasSeenSplash) {
-      setShow(true);
-      readyTimer.current = setTimeout(() => exitSplash(), 2200);
-    } else {
+    if (hasSeenSplash) {
       document.documentElement.classList.add('splash-seen');
+      return;
     }
 
+    setShow(true);
+    readyTimer.current = setTimeout(() => setReady(true), 3000);
+
     return () => {
-      if (cycleTimer.current) clearInterval(cycleTimer.current);
       if (readyTimer.current) clearTimeout(readyTimer.current);
     };
   }, []);
@@ -61,20 +59,16 @@ export default function SplashScreen() {
         >
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(244,114,182,0.16),transparent_55%),linear-gradient(135deg,#020617,#0f172a_55%,#1e1b4b)]" />
-            {VIDEOS.map((video, index) => (
-              <video
-                key={video.url}
-                src={video.url}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-                  index === activeVideo ? 'opacity-100' : 'opacity-0'
-                }`}
-              />
-            ))}
+            <video
+              key={SPLASH_VIDEO.url}
+              src={SPLASH_VIDEO.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
             <img
               src={OVERLAY_IMAGE}
               alt=""
@@ -84,15 +78,16 @@ export default function SplashScreen() {
           <div className="absolute inset-0 bg-black/15" />
 
           <div className="relative z-10 flex h-full flex-col items-center justify-center px-6">
-            <AnimatePresence>
-              {ready && (
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -16 }}
-                  transition={{ duration: 0.7, ease: "easeOut" }}
-                  className="flex flex-col items-center"
-                >
+            <div className="relative px-8 py-12 sm:px-16 sm:py-16">
+              <AnimatePresence>
+                {ready && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="flex flex-col items-center"
+                  >
                   <div className="flex flex-col items-center">
                     <span
                       className="text-sm font-black italic uppercase tracking-[0.55em] text-cyan-200 sm:text-lg"
@@ -118,15 +113,16 @@ export default function SplashScreen() {
                   >
                     Enter
                   </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            {!ready && (
-              <p className="absolute bottom-8 text-[10px] tracking-[0.5em] text-white/40">
-                LOADING IMMERSIVE SPACE...
-              </p>
-            )}
+              {!ready && (
+                <p className="text-[10px] tracking-[0.5em] text-white/40">
+                  LOADING IMMERSIVE SPACE...
+                </p>
+              )}
+            </div>
           </div>
         </motion.div>
       )}

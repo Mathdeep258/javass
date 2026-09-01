@@ -34,8 +34,6 @@ function formatUpdateTime(dateString: string) {
   } catch { return dateString; }
 }
 
-export const dynamic = 'force-dynamic';
-
 export default function Home() {
   const postsDirectory = path.join(process.cwd(), 'posts');
   let allPosts: any[] = [];
@@ -69,7 +67,7 @@ export default function Home() {
   let allChatters: any[] = [];
   try {
     if (fs.existsSync(chattersDirectory)) {
-      const chatterFiles = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md'));
+      const chatterFiles = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md') && !f.startsWith('draft_'));
       allChatters = chatterFiles.map(fileName => {
         const fullPath = path.join(chattersDirectory, fileName);
         const { data, content } = matter(fs.readFileSync(fullPath, 'utf8'));

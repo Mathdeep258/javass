@@ -125,7 +125,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       let source: any[] | null = null;
 
       // 生产模式优先从后端拉最新歌单，本地模式直接读静态配置
-      if (process.env.NODE_ENV === "production") {
+      const isLocalPreview = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+      if (process.env.NODE_ENV === "production" && isLocalPreview) {
         source = await fetchBackendPlaylist();
       }
 

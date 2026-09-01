@@ -60,19 +60,19 @@ export default function LumoraHero({
   return (
     <section className="lumora-hero relative w-full h-screen overflow-hidden bg-black text-white">
       <div className="absolute inset-0">
-        {VIDEOS.map((video, index) => (
-          <video
-            key={video.url}
-            src={video.url}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
-              index === activeVideo ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-        ))}
+        {VIDEOS.map((video, index) =>
+          index === activeVideo ? (
+            <video
+              key={video.url}
+              src={video.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : null
+        )}
         <img
           src={OVERLAY_IMAGE}
           alt=""

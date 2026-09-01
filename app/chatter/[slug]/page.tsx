@@ -29,7 +29,7 @@ export async function generateStaticParams() {
   if (!fs.existsSync(chattersDirectory)) return [];
   const filenames = fs.readdirSync(chattersDirectory);
   return filenames
-    .filter((name) => name.endsWith('.md'))
+    .filter((name) => name.endsWith('.md') && !name.startsWith('draft_'))
     .map((name) => ({
       slug: name.replace(/\.md$/, ''),
     }));
@@ -104,7 +104,7 @@ async function getChatterData(slug: string) {
 function getRecentChatters(currentSlug: string) {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
   let fileNames: string[] = [];
-  try { fileNames = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
+  try { fileNames = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md') && !f.startsWith('draft_')); } catch(e) {}
   if (!fileNames) return [];
 
   return fileNames.map(f => {

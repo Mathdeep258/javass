@@ -12,8 +12,6 @@ export const metadata = {
   title: "归档与探索 | " + siteConfig.title,
 };
 
-export const dynamic = 'force-dynamic';
-
 export default function Timeline() {
   const postsDirectory = path.join(process.cwd(), 'posts');
   let posts: any[] = [];

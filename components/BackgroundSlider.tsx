@@ -9,6 +9,8 @@ export default function BackgroundSlider() {
   useEffect(() => {
     let isMounted = true;
     const loadImages = async () => {
+      const isLocalPreview = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!isLocalPreview) return;
       try {
         const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
         if (!configRes.ok) return;
@@ -32,26 +34,33 @@ export default function BackgroundSlider() {
 
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
-    }, 10000); // 10秒切换一次
+    }, 10000);
 
     return () => clearInterval(timer);
   }, [images.length]);
+
+  // Only the current and next layers get a backgroundImage so hidden layers are not downloaded.
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const nextImage = new Image();
+    nextImage.src = images[(index + 1) % images.length];
+  }, [index, images]);
 
   return (
     <div className="absolute inset-0 z-[-10] overflow-hidden">
       {images.map((img, i) => (
         <div
           key={img}
-          className="absolute inset-0 transition-opacity duration-[2000ms] ease-in-out transform-gpu"
-          style={{
-            backgroundImage: `url(${img})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            // 当前显示的图片 opacity 为 1，其他的为 0
-            opacity: i === index ? 1 : 0,
-            // 解决层级重叠导致的渲染压力
-            visibility: Math.abs(i - index) <= 1 || (i === images.length - 1 && index === 0) ? 'visible' : 'hidden'
-          }}
+          className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out transform-gpu ${i === index ? 'opacity-100' : 'opacity-0'}`}
+          style={
+            i === index || i === (index + 1) % images.length
+              ? {
+                  backgroundImage: `url(${img})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+              : undefined
+          }
         />
       ))}
     </div>

@@ -12,8 +12,6 @@ export const metadata = {
   description: "日常碎片与灵感记录",
 };
 
-export const dynamic = 'force-dynamic';
-
 export default function ChatterPage() {
   // 注意：这里我们假设你的 md 文件放在根目录的 chatters 文件夹里
   const chattersDirectory = path.join(process.cwd(), 'chatters');
@@ -25,7 +23,7 @@ export default function ChatterPage() {
       fs.mkdirSync(chattersDirectory);
     }
 
-    const fileNames = fs.readdirSync(chattersDirectory).filter(fileName => fileName.endsWith('.md'));
+    const fileNames = fs.readdirSync(chattersDirectory).filter(fileName => fileName.endsWith('.md') && !fileName.startsWith('draft_'));
 
     chatters = fileNames.map(fileName => {
       const slug = fileName.replace(/\.md$/, '');
