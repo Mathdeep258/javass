@@ -23,7 +23,7 @@ export const VIDEOS = [
 ];
 
 export const OVERLAY_IMAGE =
-  '/lumora/overlay.png';
+  '/lumora/overlay.webp';
 
 const NAV_LINKS = ['How It Works', 'Features', 'Pricing', 'Community'];
 const STATS = ['60+ Deep Sessions', '12,000+ Creators', '4.8 User Satisfaction', 'Intentional-First Design'];

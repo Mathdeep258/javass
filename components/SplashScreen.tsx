@@ -11,12 +11,13 @@ export default function SplashScreen() {
   const [ready, setReady] = useState(false);
   const [activeVideo, setActiveVideo] = useState(0);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cycleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const exitSplash = () => {
     setShow(false);
-    if (cycleTimer.current) clearInterval(cycleTimer.current);
+    if (readyTimer.current) clearTimeout(readyTimer.current);
+    if (autoAdvanceTimer.current) clearInterval(autoAdvanceTimer.current);
     try {
       sessionStorage.setItem('hasSeenSplash', 'true');
     } catch {}
@@ -29,29 +30,40 @@ export default function SplashScreen() {
   useEffect(() => {
     setIsMounted(true);
     setShow(true);
-    readyTimer.current = setTimeout(() => setReady(true), 3000);
+    readyTimer.current = setTimeout(() => setReady(true), 4500);
 
     const useLumora = siteConfig.homepageHero === 'lumora';
     if (useLumora) {
-      cycleTimer.current = setInterval(() => {
+      autoAdvanceTimer.current = setInterval(() => {
         setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
-      }, 6000);
+      }, 4000);
     }
 
     return () => {
       if (readyTimer.current) clearTimeout(readyTimer.current);
-      if (cycleTimer.current) clearInterval(cycleTimer.current);
+      if (autoAdvanceTimer.current) clearInterval(autoAdvanceTimer.current);
     };
   }, []);
 
   useEffect(() => {
     if (!show) return;
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.play().catch(() => {});
-    }
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      if (index === activeVideo) {
+        video.muted = true;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
   }, [activeVideo, show]);
+
+  useEffect(() => {
+    const nextUrl = VIDEOS[(activeVideo + 1) % VIDEOS.length].url;
+    try {
+      fetch(nextUrl, { headers: { Range: 'bytes=0-2097152' } }).catch(() => {});
+    } catch {}
+  }, [activeVideo]);
 
   if (!isMounted) return null;
 
@@ -68,29 +80,22 @@ export default function SplashScreen() {
         >
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(244,114,182,0.16),transparent_55%),linear-gradient(135deg,#020617,#0f172a_55%,#1e1b4b)]" />
-            <AnimatePresence>
-              <motion.video
-                key={VIDEOS[activeVideo].url}
-                ref={videoRef}
-                src={VIDEOS[activeVideo].url}
-                autoPlay
+            {VIDEOS.map((video, index) => (
+              <video
+                key={video.url}
+                ref={(el) => {
+                  videoRefs.current[index] = el;
+                }}
+                src={video.url}
                 muted
                 loop
                 playsInline
                 preload="auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
-                className="absolute inset-0 h-full w-full object-cover"
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+                  index === activeVideo ? 'opacity-100' : 'opacity-0'
+                }`}
               />
-            </AnimatePresence>
-            <video
-              src={VIDEOS[(activeVideo + 1) % VIDEOS.length].url}
-              preload="auto"
-              muted
-              className="absolute left-[-9999px] top-0 w-px h-px opacity-0 pointer-events-none"
-            />
+            ))}
             <img
               src={OVERLAY_IMAGE}
               alt=""
