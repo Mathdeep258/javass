@@ -5,16 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../siteConfig';
 import { VIDEOS, OVERLAY_IMAGE } from './LumoraHero';
 
-const SPLASH_VIDEO = VIDEOS[0];
-
 export default function SplashScreen() {
   const [show, setShow] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [ready, setReady] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(0);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cycleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const exitSplash = () => {
     setShow(false);
+    if (cycleTimer.current) clearInterval(cycleTimer.current);
     try {
       sessionStorage.setItem('hasSeenSplash', 'true');
     } catch {}
@@ -26,23 +28,30 @@ export default function SplashScreen() {
 
   useEffect(() => {
     setIsMounted(true);
-    let hasSeenSplash = false;
-    try {
-      hasSeenSplash = sessionStorage.getItem('hasSeenSplash') === 'true';
-    } catch {}
-
-    if (hasSeenSplash) {
-      document.documentElement.classList.add('splash-seen');
-      return;
-    }
-
     setShow(true);
     readyTimer.current = setTimeout(() => setReady(true), 3000);
 
+    const useLumora = siteConfig.homepageHero === 'lumora';
+    if (useLumora) {
+      cycleTimer.current = setInterval(() => {
+        setActiveVideo((prev) => (prev + 1) % VIDEOS.length);
+      }, 6000);
+    }
+
     return () => {
       if (readyTimer.current) clearTimeout(readyTimer.current);
+      if (cycleTimer.current) clearInterval(cycleTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!show) return;
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {});
+    }
+  }, [activeVideo, show]);
 
   if (!isMounted) return null;
 
@@ -59,15 +68,28 @@ export default function SplashScreen() {
         >
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_80%_80%,rgba(244,114,182,0.16),transparent_55%),linear-gradient(135deg,#020617,#0f172a_55%,#1e1b4b)]" />
+            <AnimatePresence>
+              <motion.video
+                key={VIDEOS[activeVideo].url}
+                ref={videoRef}
+                src={VIDEOS[activeVideo].url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </AnimatePresence>
             <video
-              key={SPLASH_VIDEO.url}
-              src={SPLASH_VIDEO.url}
-              autoPlay
-              muted
-              loop
-              playsInline
+              src={VIDEOS[(activeVideo + 1) % VIDEOS.length].url}
               preload="auto"
-              className="absolute inset-0 h-full w-full object-cover"
+              muted
+              className="absolute left-[-9999px] top-0 w-px h-px opacity-0 pointer-events-none"
             />
             <img
               src={OVERLAY_IMAGE}
