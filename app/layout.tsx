@@ -1,6 +1,5 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_SC, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import BackgroundEffects from "../components/BackgroundEffects";
@@ -16,21 +15,6 @@ import DanmakuBackground from '../components/DanmakuBackground';
 
 import MobileBackButton from '../components/MobileBackButton';
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-
-const notoSerif = Noto_Serif_SC({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-serif",
-  display: 'swap',
-});
-const instrumentSerif = Instrument_Serif({
-  weight: ["400"],
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-});
-
 export const metadata: Metadata = {
   title: siteConfig.title,
   description: siteConfig.bio,
@@ -44,7 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} ${instrumentSerif.className} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <head>

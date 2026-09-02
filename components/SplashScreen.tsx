@@ -10,13 +10,17 @@ export default function SplashScreen() {
   const [isMounted, setIsMounted] = useState(false);
   const [ready, setReady] = useState(false);
   const [activeVideo, setActiveVideo] = useState(0);
+  const [videoStarted, setVideoStarted] = useState(false);
+  const [minDelayDone, setMinDelayDone] = useState(false);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoAdvanceTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const exitSplash = () => {
     setShow(false);
     if (readyTimer.current) clearTimeout(readyTimer.current);
+    if (maxTimer.current) clearTimeout(maxTimer.current);
     if (autoAdvanceTimer.current) clearInterval(autoAdvanceTimer.current);
     try {
       sessionStorage.setItem('hasSeenSplash', 'true');
@@ -30,7 +34,8 @@ export default function SplashScreen() {
   useEffect(() => {
     setIsMounted(true);
     setShow(true);
-    readyTimer.current = setTimeout(() => setReady(true), 4500);
+    readyTimer.current = setTimeout(() => setMinDelayDone(true), 4500);
+    maxTimer.current = setTimeout(() => setReady(true), 8000);
 
     const useLumora = siteConfig.homepageHero === 'lumora';
     if (useLumora) {
@@ -41,9 +46,14 @@ export default function SplashScreen() {
 
     return () => {
       if (readyTimer.current) clearTimeout(readyTimer.current);
+      if (maxTimer.current) clearTimeout(maxTimer.current);
       if (autoAdvanceTimer.current) clearInterval(autoAdvanceTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (videoStarted && minDelayDone) setReady(true);
+  }, [videoStarted, minDelayDone]);
 
   useEffect(() => {
     if (!show) return;
@@ -90,7 +100,8 @@ export default function SplashScreen() {
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload={index === activeVideo ? 'auto' : 'none'}
+                onPlaying={() => setVideoStarted(true)}
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
                   index === activeVideo ? 'opacity-100' : 'opacity-0'
                 }`}
